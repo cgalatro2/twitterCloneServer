@@ -1,4 +1,5 @@
 require("./models/user");
+require("./models/tweet");
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
