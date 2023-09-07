@@ -5,7 +5,7 @@ const Tweet = mongoose.model("Tweet");
 
 const router = express.Router();
 
-router.use(requireAuth);
+// router.use(requireAuth);
 
 router.get("/tweets", async (_req, res) => {
   const tweets = await Tweet.find({});
