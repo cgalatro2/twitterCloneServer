@@ -34,7 +34,7 @@ router.post("/login", async (req, res) => {
   try {
     await user.comparePassword(password);
     const token = jwt.sign({ userId: user._id }, "SECRET_KEY");
-    res.send({ token });
+    res.send({ token, user: JSON.stringify(user) });
   } catch (err) {
     return res.status(404).send({ error: "Inavlid email and/or password." });
   }

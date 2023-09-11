@@ -14,14 +14,14 @@ router.get("/tweets", async (_req, res) => {
 });
 
 router.post("/tweets", async (req, res) => {
-  const { content, userId } = req.body;
+  const { content } = req.body;
 
-  if ((!content, !userId)) {
+  if (!content) {
     return res.status(422).send({ error: "Must provide content and userId." });
   }
 
   try {
-    const tweet = new Tweet({ content, userId, timestamp: Date.now() });
+    const tweet = new Tweet({ content, timestamp: Date.now() });
     await tweet.save();
     res.send(tweet);
   } catch (err) {
