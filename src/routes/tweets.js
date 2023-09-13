@@ -9,21 +9,31 @@ const router = express.Router();
 
 router.get("/tweets", async (_req, res) => {
   const tweets = await Tweet.find({});
+  res.json(tweets);
+});
 
+router.get("/tweets/:username", async (req, res) => {
+  const tweets = await Tweet.find({ username: req.params.username });
   res.json(tweets);
 });
 
 router.post("/tweets", async (req, res) => {
-  const { content } = req.body;
+  const { content, userId, username } = req.body;
 
-  if (!content) {
-    return res.status(422).send({ error: "Must provide content and userId." });
+  if (!content || !userId || !username) {
+    return res
+      .status(422)
+      .send({ error: "Must provide content, username and userId." });
   }
 
   try {
-    const tweet = new Tweet({ content, timestamp: Date.now() });
+    const tweet = new Tweet({
+      content,
+      userId,
+      username,
+      timestamp: Date.now(),
+    });
     await tweet.save();
-    res.send(tweet);
   } catch (err) {
     res.status(422).send({ error: err.message });
   }

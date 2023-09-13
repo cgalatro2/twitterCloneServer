@@ -34,7 +34,7 @@ mongoose.connection.on("open", function () {
 });
 
 const port = 3000;
-app.get("/", async function (req, res) {
+app.get("/", async function (_req, res) {
   res.send(`hey there!`);
 });
 app.listen(port, () => {
