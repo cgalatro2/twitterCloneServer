@@ -18,23 +18,23 @@ router.get("/tweets/:username", async (req, res) => {
 });
 
 router.post("/tweets", async (req, res) => {
-  const { content, userId, username } = req.body;
+  const { content, username } = req.body;
 
-  if (!content || !userId || !username) {
+  if (!content || !username) {
     return res
-      .status(422)
-      .send({ error: "Must provide content, username and userId." });
+      .status(418)
+      .send({ error: "Must provide content and username." });
   }
 
   try {
     const tweet = new Tweet({
       content,
-      userId,
       username,
       timestamp: Date.now(),
     });
     await tweet.save();
   } catch (err) {
+    console.log(err);
     res.status(422).send({ error: err.message });
   }
 });

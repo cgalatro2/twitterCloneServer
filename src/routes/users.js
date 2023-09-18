@@ -5,13 +5,12 @@ const User = require("../models/user");
 
 router.get("/users", async (req, res) => {
   try {
-    const { userId } = req.query;
-    const user = await User.findById(userId);
+    const users = await User.find({});
 
-    if (user) {
-      res.send({ user: JSON.stringify(user) });
+    if (users) {
+      res.send({ users: JSON.stringify(users) });
     } else {
-      res.status(404).send({ error: "User not found." });
+      res.status(404).send({ error: "No users not found." });
     }
   } catch (err) {
     res.status(400).send({ error: err.message });
@@ -20,8 +19,8 @@ router.get("/users", async (req, res) => {
 
 router.get("/users/:username", async (req, res) => {
   try {
-    const { userId } = req.query;
-    const user = await User.findOne({ username: req.params.username });
+    const username = req.params.username;
+    const user = await User.findOne({ username });
 
     if (user) {
       res.send({ user: JSON.stringify(user) });
