@@ -8,7 +8,7 @@ router.get("/users", async (req, res) => {
     const users = await User.find({});
 
     if (users) {
-      res.send({ users: JSON.stringify(users) });
+      res.send({ users });
     } else {
       res.status(404).send({ error: "No users not found." });
     }
@@ -23,7 +23,7 @@ router.get("/users/:username", async (req, res) => {
     const user = await User.findOne({ username });
 
     if (user) {
-      res.send({ user: JSON.stringify(user) });
+      res.send({ user });
     } else {
       res.status(404).send({ error: "User not found." });
     }

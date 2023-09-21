@@ -13,8 +13,12 @@ router.get("/tweets", async (_req, res) => {
 });
 
 router.get("/tweets/:username", async (req, res) => {
-  const tweets = await Tweet.find({ username: req.params.username });
-  res.json(tweets);
+  try {
+    const tweets = await Tweet.find({ username: req.params.username });
+    res.send(tweets);
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 router.post("/tweets", async (req, res) => {
@@ -33,6 +37,7 @@ router.post("/tweets", async (req, res) => {
       timestamp: Date.now(),
     });
     await tweet.save();
+    res.send(tweet);
   } catch (err) {
     console.log(err);
     res.status(422).send({ error: err.message });

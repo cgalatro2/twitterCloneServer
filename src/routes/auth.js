@@ -19,7 +19,7 @@ router.post("/signup", async (req, res) => {
     await user.save();
 
     const token = jwt.sign({ userId: user._id }, "SECRET_KEY");
-    res.send({ token, user: JSON.stringify(user) });
+    res.send({ token, user });
   } catch (err) {
     return res.status(422).send(err.message);
   }
@@ -40,7 +40,7 @@ router.post("/login", async (req, res) => {
   try {
     await user.comparePassword(password);
     const token = jwt.sign({ userId: user._id }, "SECRET_KEY");
-    res.send({ token, user: JSON.stringify(user) });
+    res.send({ token, user });
   } catch (err) {
     return res.status(404).send({ error: "Inavlid email and/or password." });
   }
