@@ -39,7 +39,48 @@ router.post("/tweets", async (req, res) => {
     await tweet.save();
     res.send(tweet);
   } catch (err) {
-    console.log(err);
+    res.status(422).send({ error: err.message });
+  }
+});
+
+router.post("/tweets/:_id/like", async (req, res) => {
+  const { _id } = req.params;
+  const { userId } = req.body;
+
+  if (!_id || !userId) {
+    return res
+      .status(418)
+      .send({ error: "Must provide tweet _id and userId." });
+  }
+
+  try {
+    const tweet = await Tweet.findOne({ _id });
+    tweet.likes.push(userId);
+    tweet.save();
+    res.send(tweet);
+  } catch (err) {
+    res.status(422).send({ error: err.message });
+  }
+});
+
+router.post("/tweets/:_id/unlike", async (req, res) => {
+  const { _id } = req.params;
+  const { userId } = req.body;
+
+  if (!_id || !userId) {
+    return res
+      .status(418)
+      .send({ error: "Must provide tweet _id and userId." });
+  }
+
+  try {
+    const update = await Tweet.updateOne(
+      { _id },
+      { $pull: { likes: userId } },
+      { new: true }
+    );
+    res.send(update);
+  } catch (err) {
     res.status(422).send({ error: err.message });
   }
 });
