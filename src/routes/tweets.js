@@ -21,6 +21,18 @@ router.get("/tweets/:username", async (req, res) => {
   }
 });
 
+router.get("/tweets/likes/:id", async (req, res) => {
+  try {
+    const tweet = await Tweet.findOne({ _id: req.params.id })
+      .populate("likes")
+      .exec();
+    res.send(tweet.likes);
+  } catch (err) {
+    console.log(err);
+    res.status(422).send({ error: err.message });
+  }
+});
+
 router.post("/tweets", async (req, res) => {
   const { content, username } = req.body;
 
