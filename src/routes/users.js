@@ -32,6 +32,36 @@ router.get("/users/:username", async (req, res) => {
   }
 });
 
+router.get("/users/:username/followers", async (req, res) => {
+  try {
+    const { username } = req.params;
+    const user = await User.findOne({ username }).populate("followers").exec();
+
+    if (user) {
+      res.send(user.followers);
+    } else {
+      res.status(404).send({ error: "User not found." });
+    }
+  } catch (err) {
+    res.status(400).send({ error: err.message });
+  }
+});
+
+router.get("/users/:username/following", async (req, res) => {
+  try {
+    const { username } = req.params;
+    const user = await User.findOne({ username }).populate("following").exec();
+
+    if (user) {
+      res.send(user.following);
+    } else {
+      res.status(404).send({ error: "User not found." });
+    }
+  } catch (err) {
+    res.status(400).send({ error: err.message });
+  }
+});
+
 router.post("/follow/:username", async (req, res) => {
   try {
     const username = req.params.username;
