@@ -2,51 +2,50 @@ const express = require("express");
 const requireAuth = require("../middlewares/requireAuth");
 const mongoose = require("mongoose");
 const Tweet = mongoose.model("Tweet");
+const Comment = mongoose.model("Comment");
 
 const router = express.Router();
 
 // router.use(requireAuth);
 
 router.get("/tweets", async (_req, res) => {
-  const tweets = await Tweet.find({});
+  const tweets = await Tweet.find({}).populate("user").exec();
   res.json(tweets);
 });
 
-router.get("/tweets/:username", async (req, res) => {
+router.get("/tweets/:user", async (req, res) => {
+  const { user } = req.params;
   try {
-    const tweets = await Tweet.find({ username: req.params.username });
+    const tweets = await Tweet.find({ user });
     res.send(tweets);
   } catch (err) {
-    console.log(err);
+    res.status(404).send({
+      error: `Cannot find tweets for this user. Error: ${err.message}`,
+    });
   }
 });
 
-router.get("/tweets/likes/:id", async (req, res) => {
+router.get("/tweets/likes/:_id", async (req, res) => {
+  const { _id } = req.params;
   try {
-    const tweet = await Tweet.findOne({ _id: req.params.id })
-      .populate("likes")
-      .exec();
+    const tweet = await Tweet.findOne({ _id }).populate("likes").exec();
     res.send(tweet.likes);
   } catch (err) {
-    console.log(err);
     res.status(422).send({ error: err.message });
   }
 });
 
 router.post("/tweets", async (req, res) => {
-  const { content, username } = req.body;
+  const { content, user } = req.body;
 
-  if (!content || !username) {
-    return res
-      .status(418)
-      .send({ error: "Must provide content and username." });
+  if (!content || !user) {
+    return res.status(418).send({ error: "Must provide content and userId." });
   }
 
   try {
     const tweet = new Tweet({
       content,
-      username,
-      timestamp: Date.now(),
+      user,
     });
     await tweet.save();
     res.send(tweet);
@@ -57,17 +56,15 @@ router.post("/tweets", async (req, res) => {
 
 router.post("/tweets/:_id/like", async (req, res) => {
   const { _id } = req.params;
-  const { userId } = req.body;
+  const { user } = req.body;
 
-  if (!_id || !userId) {
-    return res
-      .status(418)
-      .send({ error: "Must provide tweet _id and userId." });
+  if (!_id || !user) {
+    return res.status(418).send({ error: "Must provide tweet _id and user." });
   }
 
   try {
     const tweet = await Tweet.findOne({ _id });
-    tweet.likes.push(userId);
+    tweet.likes.push(user);
     tweet.save();
     res.send(tweet);
   } catch (err) {
@@ -77,21 +74,69 @@ router.post("/tweets/:_id/like", async (req, res) => {
 
 router.post("/tweets/:_id/unlike", async (req, res) => {
   const { _id } = req.params;
-  const { userId } = req.body;
+  const { user } = req.body;
 
-  if (!_id || !userId) {
-    return res
-      .status(418)
-      .send({ error: "Must provide tweet _id and userId." });
+  if (!_id || !user) {
+    return res.status(418).send({ error: "Must provide tweet _id and user." });
   }
 
   try {
     const update = await Tweet.updateOne(
       { _id },
-      { $pull: { likes: userId } },
+      { $pull: { likes: user } },
       { new: true }
     );
     res.send(update);
+  } catch (err) {
+    res.status(422).send({ error: err.message });
+  }
+});
+
+router.get("/tweets/:_id/comments", async (req, res) => {
+  const { _id } = req.params;
+
+  if (!_id) {
+    return res.status(400).send({ error: "Must provide tweet ID." });
+  }
+
+  try {
+    const tweet = await Tweet.findOne({ _id })
+      .populate({
+        path: "comments",
+        populate: {
+          path: "user",
+          model: "User",
+        },
+      })
+      .exec();
+    res.send(tweet.comments);
+  } catch (err) {
+    res.status(422).send({ error: err.message });
+  }
+});
+
+router.post("/tweets/:_id/comment", async (req, res) => {
+  const { _id } = req.params;
+  const { content, user } = req.body;
+
+  if (!content || !_id || !user) {
+    return res
+      .status(400)
+      .send({ error: "Must provide content, tweet ID, and user." });
+  }
+
+  try {
+    const comment = new Comment({
+      content,
+      user,
+      tweet: _id,
+    });
+    await comment.save();
+
+    const tweet = await Tweet.findOne({ _id });
+    tweet.comments.push(comment._id);
+    tweet.save();
+    res.send(tweet);
   } catch (err) {
     res.status(422).send({ error: err.message });
   }

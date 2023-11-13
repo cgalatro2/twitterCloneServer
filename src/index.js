@@ -1,5 +1,6 @@
 require("./models/user");
 require("./models/tweet");
+require("./models/comment");
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
@@ -10,6 +11,7 @@ const bodyParser = require("body-parser");
 
 const tweetRoutes = require("./routes/tweets");
 const userRoutes = require("./routes/users");
+const commentRoutes = require("./routes/comments");
 const authRoutes = require("./routes/auth");
 
 const app = express();
@@ -17,6 +19,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(tweetRoutes);
 app.use(userRoutes);
+app.use(commentRoutes);
 app.use(authRoutes);
 
 mongoose.set("strictQuery", false);
