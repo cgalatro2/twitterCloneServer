@@ -16,7 +16,7 @@ router.get("/tweets", async (_req, res) => {
 router.get("/tweets/:user", async (req, res) => {
   const { user } = req.params;
   try {
-    const tweets = await Tweet.find({ user });
+    const tweets = await Tweet.find({ user }).populate("user").exec();
     res.send(tweets);
   } catch (err) {
     res.status(404).send({
