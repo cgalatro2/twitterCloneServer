@@ -25,6 +25,28 @@ router.get("/tweets/:user", async (req, res) => {
   }
 });
 
+router.get("/tweet/:_id", async (req, res) => {
+  const { _id } = req.params;
+  try {
+    const tweet = await Tweet.findOne({ _id })
+      .populate("user")
+      .populate({
+        path: "comments",
+        model: "Comment",
+        populate: {
+          path: "user",
+          model: "User",
+        },
+      })
+      .exec();
+    res.send(tweet);
+  } catch (err) {
+    res.status(404).send({
+      error: `Cannot find this tweet. Error: ${err.message}`,
+    });
+  }
+});
+
 router.get("/tweets/likes/:_id", async (req, res) => {
   const { _id } = req.params;
   try {

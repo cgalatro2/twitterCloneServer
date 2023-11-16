@@ -17,10 +17,10 @@ router.get("/users", async (_req, res) => {
   }
 });
 
-router.get("/users/:username", async (req, res) => {
+router.get("/users/:_id", async (req, res) => {
   try {
-    const username = req.params.username;
-    const user = await User.findOne({ username });
+    const { _id } = req.params;
+    const user = await User.findOne({ _id });
 
     if (user) {
       res.send({ user });
