@@ -71,7 +71,9 @@ router.post("/follow/:username", async (req, res) => {
 
     if (userToFollow && followingUser) {
       // add the id of the user you want to follow in following array
-      const newFollowers = [...userToFollow.followers, followingUser._id];
+      const newFollowers = Array.from(
+        new Set([...userToFollow.followers, followingUser._id])
+      );
 
       const update = {
         followers: newFollowers,
@@ -79,7 +81,9 @@ router.post("/follow/:username", async (req, res) => {
       const updated = await User.updateOne({ username }, update, { new: true });
 
       // add your id to the followers array of the user you want to follow
-      const newFollowing = [...followingUser.following, userToFollow._id];
+      const newFollowing = Array.from(
+        new Set([...followingUser.following, userToFollow._id])
+      );
 
       const secondUpdate = {
         following: newFollowing,

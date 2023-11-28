@@ -9,14 +9,20 @@ const router = express.Router();
 // router.use(requireAuth);
 
 router.get("/tweets", async (_req, res) => {
-  const tweets = await Tweet.find({}).populate("user").exec();
+  const tweets = await Tweet.find({})
+    .sort({ createdAt: -1 })
+    .populate("user")
+    .exec();
   res.json(tweets);
 });
 
 router.get("/tweets/:user", async (req, res) => {
   const { user } = req.params;
   try {
-    const tweets = await Tweet.find({ user }).populate("user").exec();
+    const tweets = await Tweet.find({ user })
+      .sort({ createdAt: -1 })
+      .populate("user")
+      .exec();
     res.send(tweets);
   } catch (err) {
     res.status(404).send({
@@ -86,11 +92,16 @@ router.post("/tweets/:_id/like", async (req, res) => {
 
   try {
     const tweet = await Tweet.findOne({ _id });
+    if (tweet.likes.includes(user)) {
+      return res
+        .status(418)
+        .send({ error: "Tweet already liked by this user" });
+    }
     tweet.likes.push(user);
     tweet.save();
     res.send(tweet);
   } catch (err) {
-    res.status(422).send({ error: err.message });
+    return res.status(422).send({ error: err.message });
   }
 });
 
