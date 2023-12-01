@@ -7,20 +7,20 @@ const dotenv = require("dotenv");
 dotenv.config();
 const bodyParser = require("body-parser");
 
-// const requireAuth = require("./middlewares/requireAuth");
-
 const tweetRoutes = require("./routes/tweets");
 const userRoutes = require("./routes/users");
 const commentRoutes = require("./routes/comments");
 const authRoutes = require("./routes/auth");
+const requireAuth = require("./middlewares/requireAuth");
 
 const app = express();
 
 app.use(bodyParser.json());
+app.use(authRoutes);
+app.use(requireAuth);
 app.use(tweetRoutes);
 app.use(userRoutes);
 app.use(commentRoutes);
-app.use(authRoutes);
 
 mongoose.set("strictQuery", false);
 mongoose.connect(

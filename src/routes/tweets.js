@@ -1,12 +1,9 @@
 const express = require("express");
-const requireAuth = require("../middlewares/requireAuth");
 const mongoose = require("mongoose");
 const Tweet = mongoose.model("Tweet");
 const Comment = mongoose.model("Comment");
 
 const router = express.Router();
-
-// router.use(requireAuth);
 
 router.get("/tweets", async (_req, res) => {
   const tweets = await Tweet.find({})
